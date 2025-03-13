@@ -11,10 +11,6 @@
             "preset": "angular",
             "infile": "CHANGELOG.md",
             "header": "# Changelog"
-        },
-        "@release-it/bumper": {
-            "in": "composer.json",
-            "out": "composer.json"
         }
     }
 }
