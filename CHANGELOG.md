@@ -1,5 +1,12 @@
 # Changelog
 
+# 0.2.0 (2025-03-13)
+
+
+### Features
+
+* Initial implementation ([f50a8b0](https://github.com/mortenscheel/laravel-query-recorder/commit/f50a8b08cae73412f706dbcc400948b0ab6a457b))
+
 # 0.1.0 (2024-12-28)
 
 
