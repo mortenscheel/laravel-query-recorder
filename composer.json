@@ -1,5 +1,5 @@
 {
-    "name": "mortenscheel/query-recorder",
+    "name": "mortenscheel/laravel-query-recorder",
     "description": "A skeleton repository for my packages",
     "license": "MIT",
     "keywords": [
