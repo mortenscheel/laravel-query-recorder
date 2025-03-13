@@ -1,7 +1,8 @@
 {
   "devDependencies": {
-    "@release-it/conventional-changelog": "^9.0.4",
-    "release-it": "^17.11.0"
+    "@release-it/bumper": "^7.0.2",
+    "@release-it/conventional-changelog": "^10.0.0",
+    "release-it": "^18.1"
   },
   "version": "0.1.0"
 }
