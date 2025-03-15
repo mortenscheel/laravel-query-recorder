@@ -1,6 +1,6 @@
 {
     "name": "mortenscheel/laravel-query-recorder",
-    "description": "A skeleton repository for my packages",
+    "description": "A package to record and analyze database queries in Laravel applications.",
     "license": "MIT",
     "keywords": [
         "php",

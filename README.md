@@ -7,8 +7,6 @@
     </p>
 </p>
 
-Let me update the README with the corrected interface and usage examples:
-
 # Laravel Query Recorder
 
 A package to record and analyze database queries in Laravel applications.
