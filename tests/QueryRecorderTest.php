@@ -5,8 +5,10 @@ declare(strict_types=1);
 use Illuminate\Support\Defer\DeferredCallbackCollection;
 use Illuminate\Support\Facades\DB;
 use Scheel\QueryRecorder\Facades\QueryRecorder;
+use Scheel\QueryRecorder\QueryCollection;
 use Scheel\QueryRecorder\RecordedQuery;
 use Scheel\QueryRecorder\Recorders\CsvQueryRecorder;
+use Scheel\QueryRecorder\Recorders\RecordsQueries;
 use Scheel\QueryRecorder\Tests\Fixtures\Foo;
 
 arch()->preset()->php();
@@ -70,6 +72,23 @@ it('does not record csv if no queries were recorded', function (): void {
     QueryRecorder::record($recorder);
     executeDeferred();
     expect(file_exists($path))->toBeFalse();
+});
+
+it('can record queries using a custom recorder', function (): void {
+    $recorder = new class implements RecordsQueries
+    {
+        public function __construct(public ?QueryCollection $queries = null) {}
+
+        public function recordQueries(QueryCollection $queries): void
+        {
+            $this->queries = $queries;
+        }
+    };
+    QueryRecorder::record($recorder);
+    DB::table('test_table')->first();
+    expect($recorder->queries)->toBeNull();
+    executeDeferred();
+    expect($recorder->queries)->toBeInstanceOf(QueryCollection::class);
 });
 
 function executeDeferred(): void
