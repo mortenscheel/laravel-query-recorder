@@ -21,9 +21,11 @@ composer require mortenscheel/laravel-query-recorder --dev
 
 ## Usage
 
-### Recording Queries to CSV
+This package comes with a couple of recorders.
 
-The package includes a CSV recorder that can write all queries to a CSV file. Use it in your controllers:
+### Recording all queries to CSV
+
+The package includes a CSV recorder that can write all queries to a CSV file. Example use in a controller:
 
 ```php
 use Scheel\QueryRecorder\Facades\QueryRecorder;
@@ -51,28 +53,23 @@ class UserController extends Controller
 ```
 
 The CSV file will include:
-- Time of execution
+- Query time (ms)
 - Origin (file and line number)
-- SQL query
+- SQL query (raw)
 
-### Query Origin Tracking
-
-One of the key features of this package is the ability to identify where in your code a query is being executed:
-
+## Record duplicate queries to CSV
 ```php
-$query->origin->file     // The file path where the query was initiated
-$query->origin->line     // The line number where the query was initiated
-$query->origin->function // The function that initiated the query
-$query->origin->class    // The class that initiated the query (if applicable)
-$query->origin->type     // The type of call (static or instance method)
+use Scheel\QueryRecorder\Recorders\DuplicateQueryCsvRecorder;
 
-// Additional helper methods
-$query->origin->isVendor()   // Check if the query originated from a vendor package
-$query->origin->location()   // Get the file:line format
-$query->origin->editorLink() // Get an editor link to the exact location
+QueryRecorder::record(new DuplicateQueryCsvRecorder('/path/to/output.csv'));
 ```
+This recorder will only show duplicate queries, grouped by both sql and origin.
+There will be one row per unique sql+origin, containing:
 
-This is especially helpful for debugging and optimizing database queries in your application.
+- Count
+- Total time (ms)
+- Origin
+- SQL
 
 ## Custom Recorders
 
@@ -104,6 +101,24 @@ DB::table('users')->first();
 // The recordQueries method will be called after the response
 // has been sent, with all collected queries
 ```
+### Query Origin Tracking
+
+One of the key features of this package is the ability to identify where in your code a query is being executed:
+
+```php
+$query->origin->file     // The file path where the query was initiated
+$query->origin->line     // The line number where the query was initiated
+$query->origin->function // The function that initiated the query
+$query->origin->class    // The class that initiated the query (if applicable)
+$query->origin->type     // The type of call (static or instance method)
+
+// Additional helper methods
+$query->origin->isVendor()   // Check if the query originated from a vendor package
+$query->origin->location()   // Get the file:line format
+$query->origin->editorLink() // Get an editor link to the exact location
+```
+
+This is especially helpful for debugging and optimizing database queries in your application.
 
 ### Listening for Queries
 

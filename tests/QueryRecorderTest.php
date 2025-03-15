@@ -8,8 +8,9 @@ use Scheel\QueryRecorder\Facades\QueryRecorder;
 use Scheel\QueryRecorder\QueryCollection;
 use Scheel\QueryRecorder\RecordedQuery;
 use Scheel\QueryRecorder\Recorders\CsvQueryRecorder;
+use Scheel\QueryRecorder\Recorders\DuplicateQueryCsvRecorder;
 use Scheel\QueryRecorder\Recorders\RecordsQueries;
-use Scheel\QueryRecorder\Tests\Fixtures\Foo;
+use Scheel\QueryRecorder\Tests\Fixtures\DummyClass;
 
 arch()->preset()->php();
 arch()->preset()->security();
@@ -34,10 +35,10 @@ it('can provide correct origins for queries', function (): void {
     QueryRecorder::listen(function (RecordedQuery $query) use (&$detected): void {
         $detected = $query;
     });
-    (new Foo)->doStuff();
+    (new DummyClass)->doStuff();
     expect($detected)
         ->toBeInstanceOf(RecordedQuery::class)
-        ->and($detected->origin->file)->toBe((new ReflectionClass(Foo::class))->getFileName())
+        ->and($detected->origin->file)->toBe((new ReflectionClass(DummyClass::class))->getFileName())
         ->and($detected->origin->line)->toBe(18);
 });
 
@@ -89,6 +90,60 @@ it('can record queries using a custom recorder', function (): void {
     expect($recorder->queries)->toBeNull();
     executeDeferred();
     expect($recorder->queries)->toBeInstanceOf(QueryCollection::class);
+});
+it('can record duplicate queries', function (): void {
+    $stream = tmpfile();
+    $path = stream_get_meta_data($stream)['uri'];
+    fclose($stream);
+    $recorder = new DuplicateQueryCsvRecorder($path);
+    QueryRecorder::record($recorder);
+    $dummy = new DummyClass;
+    $dummy->doStuff();
+    $dummy->doStuff();
+    $dummy->getById(3);
+    $dummy->getById(3);
+    $dummy->getById(4);
+    $dummy->getById(3);
+    $dummy->getById(4);
+    $dummy->getById(5);
+    $dummy->doStuff();
+    $dummy->doStuff();
+
+    executeDeferred();
+    $recorded = [];
+    $stream = fopen($path, 'rb');
+    fgets($stream); // Skip header
+    /** @var array<int, string> $row */
+    while (($row = fgetcsv($stream)) !== false) {
+        // Convert origin to relative path for comparison
+        [$file, $line] = explode(':', $row[2]);
+        $origin = str($file)->after(__DIR__.DIRECTORY_SEPARATOR).':'.$line;
+
+        $recorded[] = [
+            'count' => $row[0],
+            'origin' => $origin,
+            'sql' => $row[3],
+        ];
+    }
+    expect($recorded)->toBe([
+        [
+            'count' => '4',
+            'origin' => 'Fixtures/DummyClass.php:18',
+            'sql' => 'select * from "test_table" where "id" >= 10',
+        ],
+        [
+            'count' => '3',
+            'origin' => 'Fixtures/DummyClass.php:23',
+            'sql' => 'select * from "test_table" where "id" = 3',
+        ],
+        [
+            'count' => '2',
+            'origin' => 'Fixtures/DummyClass.php:23',
+            'sql' => 'select * from "test_table" where "id" = 4',
+        ],
+    ]);
+
+    unlink($path);
 });
 
 function executeDeferred(): void

@@ -6,7 +6,7 @@ namespace Scheel\QueryRecorder\Tests\Fixtures;
 
 use Illuminate\Support\Facades\DB;
 
-class Foo
+class DummyClass
 {
     public function doStuff(): void
     {
@@ -16,5 +16,10 @@ class Foo
     public function query(): void
     {
         DB::table('test_table')->where('id', '>=', 10)->get();
+    }
+
+    public function getById(int $id): void
+    {
+        DB::table('test_table')->where('id', $id)->get();
     }
 }
