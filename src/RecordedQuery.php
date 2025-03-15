@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Scheel\QueryRecorder;
 
-use Scheel\QueryRecorder\Trace\Frame;
+use Scheel\Tracer\Frame;
 
 class RecordedQuery
 {
