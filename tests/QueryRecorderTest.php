@@ -116,12 +116,12 @@ it('can record duplicate queries', function (): void {
     /** @var array<int, string> $row */
     while (($row = fgetcsv($stream)) !== false) {
         // Convert origin to relative path for comparison
-        [$file, $line] = explode(':', $row[2]);
-        $origin = basename($file).':'.$line;
+        $file = str($row[2])->beforeLast(':')->basename();
+        $line = str($row[2])->afterLast(':')->value();
 
         $recorded[] = [
             'count' => $row[0],
-            'origin' => $origin,
+            'origin' => "$file:$line",
             'sql' => $row[3],
         ];
     }
