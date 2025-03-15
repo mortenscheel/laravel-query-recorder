@@ -117,7 +117,7 @@ it('can record duplicate queries', function (): void {
     while (($row = fgetcsv($stream)) !== false) {
         // Convert origin to relative path for comparison
         [$file, $line] = explode(':', $row[2]);
-        $origin = str($file)->after(__DIR__.DIRECTORY_SEPARATOR).':'.$line;
+        $origin = basename($file).':'.$line;
 
         $recorded[] = [
             'count' => $row[0],
@@ -128,17 +128,17 @@ it('can record duplicate queries', function (): void {
     expect($recorded)->toBe([
         [
             'count' => '4',
-            'origin' => 'Fixtures/DummyClass.php:18',
+            'origin' => 'DummyClass.php:18',
             'sql' => 'select * from "test_table" where "id" >= 10',
         ],
         [
             'count' => '3',
-            'origin' => 'Fixtures/DummyClass.php:23',
+            'origin' => 'DummyClass.php:23',
             'sql' => 'select * from "test_table" where "id" = 3',
         ],
         [
             'count' => '2',
-            'origin' => 'Fixtures/DummyClass.php:23',
+            'origin' => 'DummyClass.php:23',
             'sql' => 'select * from "test_table" where "id" = 4',
         ],
     ]);

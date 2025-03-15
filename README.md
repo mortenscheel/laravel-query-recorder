@@ -15,7 +15,7 @@ A package to record and analyze database queries in Laravel applications.
 
 You can install the package via composer:
 
-```bash
+```shell
 composer require mortenscheel/laravel-query-recorder --dev
 ```
 
@@ -57,7 +57,7 @@ The CSV file will include:
 - Origin (file and line number)
 - SQL query (raw)
 
-## Record duplicate queries to CSV
+### Record duplicate queries to CSV
 ```php
 use Scheel\QueryRecorder\Recorders\DuplicateQueryCsvRecorder;
 
@@ -71,7 +71,7 @@ There will be one row per unique sql+origin, containing:
 - Origin
 - SQL
 
-## Custom Recorders
+### Custom Recorders
 
 You can create your own custom recorder by implementing the `RecordsQueries` interface:
 
@@ -120,7 +120,7 @@ $query->origin->editorLink() // Get an editor link to the exact location
 
 This is especially helpful for debugging and optimizing database queries in your application.
 
-### Listening for Queries
+## Listening for Queries
 
 This is similar to Laravel's `DB::listen()` except you receive a `RecordedQuery` with extra metadata.
 
