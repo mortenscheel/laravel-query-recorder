@@ -1,5 +1,12 @@
 # Changelog
 
+# [1.1.0](https://github.com/mortenscheel/laravel-query-recorder/compare/1.0.0...1.1.0) (2025-03-15)
+
+
+### Features
+
+* add duplicate query recorder ([2679f2c](https://github.com/mortenscheel/laravel-query-recorder/commit/2679f2c440acf7e0c8598aa1090a7382eb4e8890))
+
 # [1.0.0](https://github.com/mortenscheel/laravel-query-recorder/compare/0.2.0...1.0.0) (2025-03-15)
 
 
