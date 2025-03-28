@@ -1,5 +1,17 @@
 # Changelog
 
+# [2.0.0](https://github.com/mortenscheel/laravel-query-recorder/compare/1.1.0...2.0.0) (2025-03-28)
+
+
+### Code Refactoring
+
+* rename classes and namespaces ([0506462](https://github.com/mortenscheel/laravel-query-recorder/commit/05064621cc135090f3278ba8e456fa250cfc1ec0))
+
+
+### BREAKING CHANGES
+
+* renaming
+
 # [1.1.0](https://github.com/mortenscheel/laravel-query-recorder/compare/1.0.0...1.1.0) (2025-03-15)
 
 
