@@ -6,10 +6,8 @@ namespace Scheel\QueryRecorder;
 
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Support\Facades\DB;
-use Scheel\QueryRecorder\Recorders\RecordsQueries;
+use Scheel\QueryRecorder\Processors\QueryCollectionProcessor;
 use Scheel\Tracer\StackTrace;
-
-use function Illuminate\Support\defer;
 
 class QueryRecorderService
 {
@@ -24,16 +22,8 @@ class QueryRecorderService
         });
     }
 
-    public function record(RecordsQueries $recorder): void
+    public function record(QueryCollectionProcessor $recorder): Recorder
     {
-        $records = [];
-        DB::listen(function (QueryExecuted $event) use (&$records): void {
-            if ($frame = StackTrace::getTrace()->ignoreVendor()->ignoreFile(__FILE__)->first()) {
-                $records[] = new RecordedQuery($event->toRawSql(), $event->time, $frame);
-            }
-        });
-        defer(function () use ($recorder, &$records): void {
-            $recorder->recordQueries(QueryCollection::make($records));
-        });
+        return new Recorder($recorder);
     }
 }

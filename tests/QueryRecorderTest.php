@@ -5,12 +5,13 @@ declare(strict_types=1);
 use Illuminate\Support\Defer\DeferredCallbackCollection;
 use Illuminate\Support\Facades\DB;
 use Scheel\QueryRecorder\Facades\QueryRecorder;
+use Scheel\QueryRecorder\Processors\CsvProcessor;
+use Scheel\QueryRecorder\Processors\DuplicateQueryCsvProcessor;
+use Scheel\QueryRecorder\Processors\QueryCollectionProcessor;
 use Scheel\QueryRecorder\QueryCollection;
 use Scheel\QueryRecorder\RecordedQuery;
-use Scheel\QueryRecorder\Recorders\CsvQueryRecorder;
-use Scheel\QueryRecorder\Recorders\DuplicateQueryCsvRecorder;
-use Scheel\QueryRecorder\Recorders\RecordsQueries;
 use Scheel\QueryRecorder\Tests\Fixtures\DummyClass;
+use Scheel\QueryRecorder\Tests\Fixtures\NullProcessor;
 
 arch()->preset()->php();
 arch()->preset()->security();
@@ -30,6 +31,13 @@ it('can listen for queries', function (): void {
         ->and($detected->origin->line)->toBe($queryLine);
 });
 
+it('can record queries', function (): void {
+    $recorder = QueryRecorder::record(new NullProcessor);
+    expect($recorder->getQueries())->toHaveCount(0);
+    DB::table('test_table')->first();
+    expect($recorder->getQueries())->toHaveCount(1);
+});
+
 it('can provide correct origins for queries', function (): void {
     $detected = null;
     QueryRecorder::listen(function (RecordedQuery $query) use (&$detected): void {
@@ -46,7 +54,7 @@ it('can record queries to csv', function (): void {
     $stream = tmpfile();
     $path = stream_get_meta_data($stream)['uri'];
     fclose($stream);
-    $recorder = new CsvQueryRecorder($path);
+    $recorder = new CsvProcessor($path);
     QueryRecorder::record($recorder);
     DB::table('test_table')->first();
     $firstQueryLine = __LINE__ - 1;
@@ -65,22 +73,23 @@ it('can record queries to csv', function (): void {
         ->and($sql2)->toBe('select * from "test_table" order by "created_at" desc limit 1');
     unlink($path);
 });
+
 it('does not record csv if no queries were recorded', function (): void {
     $stream = tmpfile();
     $path = stream_get_meta_data($stream)['uri'];
     fclose($stream);
-    $recorder = new CsvQueryRecorder($path);
+    $recorder = new CsvProcessor($path);
     QueryRecorder::record($recorder);
     executeDeferred();
     expect(file_exists($path))->toBeFalse();
 });
 
 it('can record queries using a custom recorder', function (): void {
-    $recorder = new class implements RecordsQueries
+    $recorder = new class implements QueryCollectionProcessor
     {
         public function __construct(public ?QueryCollection $queries = null) {}
 
-        public function recordQueries(QueryCollection $queries): void
+        public function process(QueryCollection $queries): void
         {
             $this->queries = $queries;
         }
@@ -95,7 +104,7 @@ it('can record duplicate queries', function (): void {
     $stream = tmpfile();
     $path = stream_get_meta_data($stream)['uri'];
     fclose($stream);
-    $recorder = new DuplicateQueryCsvRecorder($path);
+    $recorder = new DuplicateQueryCsvProcessor($path);
     QueryRecorder::record($recorder);
     $dummy = new DummyClass;
     $dummy->doStuff();

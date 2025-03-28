@@ -29,14 +29,14 @@ The package includes a CSV recorder that can write all queries to a CSV file. Ex
 
 ```php
 use Scheel\QueryRecorder\Facades\QueryRecorder;
-use Scheel\QueryRecorder\Recorders\CsvQueryRecorder;
+use Scheel\QueryRecorder\Processors\CsvProcessor;
 
 class UserController extends Controller
 {
     public function index()
     {
         // Create a CSV recorder with a file path
-        $recorder = new CsvQueryRecorder(storage_path('queries.csv'));
+        $recorder = new CsvProcessor(storage_path('queries.csv'));
 
         // Start recording
         QueryRecorder::record($recorder);
@@ -58,10 +58,11 @@ The CSV file will include:
 - SQL query (raw)
 
 ### Record duplicate queries to CSV
-```php
-use Scheel\QueryRecorder\Recorders\DuplicateQueryCsvRecorder;
 
-QueryRecorder::record(new DuplicateQueryCsvRecorder('/path/to/output.csv'));
+```php
+use Scheel\QueryRecorder\Processors\DuplicateQueryCsvProcessor;
+
+QueryRecorder::record(new DuplicateQueryCsvProcessor('/path/to/output.csv'));
 ```
 This recorder will only show duplicate queries, grouped by both sql and origin.
 There will be one row per unique sql+origin, containing:
@@ -79,9 +80,9 @@ You can create your own custom recorder by implementing the `RecordsQueries` int
 use Scheel\QueryRecorder\RecordsQueries;
 use Scheel\QueryRecorder\QueryCollection;
 
-class CustomRecorder implements RecordsQueries
+class CustomProcessor implements QueryCollectionProcessor
 {
-    public function recordQueries(QueryCollection $queries): void
+    public function process(QueryCollection $queries): void
     {
         // Custom implementation to record the queries collection
         // This will be called after the request is complete
@@ -92,7 +93,7 @@ class CustomRecorder implements RecordsQueries
 Usage example:
 
 ```php
-$recorder = new CustomRecorder();
+$recorder = new CustomProcessor();
 QueryRecorder::record($recorder);
 
 // Execute queries...

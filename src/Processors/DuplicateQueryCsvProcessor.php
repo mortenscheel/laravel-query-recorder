@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Scheel\QueryRecorder\Recorders;
+namespace Scheel\QueryRecorder\Processors;
 
 use Illuminate\Support\Collection;
 use Scheel\QueryRecorder\QueryCollection;
@@ -10,11 +10,11 @@ use Scheel\QueryRecorder\RecordedQuery;
 
 use function fputcsv;
 
-readonly class DuplicateQueryCsvRecorder implements RecordsQueries
+readonly class DuplicateQueryCsvProcessor implements QueryCollectionProcessor
 {
     public function __construct(private string $path) {}
 
-    public function recordQueries(QueryCollection $queries): void
+    public function process(QueryCollection $queries): void
     {
         /** @var Collection<int, array<string, string>> $rows */
         $rows = $queries->toBase()

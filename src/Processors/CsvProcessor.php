@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Scheel\QueryRecorder\Recorders;
+namespace Scheel\QueryRecorder\Processors;
 
 use Scheel\QueryRecorder\QueryCollection;
 use Scheel\QueryRecorder\RecordedQuery;
@@ -11,11 +11,11 @@ use function fclose;
 use function fopen;
 use function fputcsv;
 
-readonly class CsvQueryRecorder implements RecordsQueries
+readonly class CsvProcessor implements QueryCollectionProcessor
 {
     public function __construct(private string $path) {}
 
-    public function recordQueries(QueryCollection $queries): void
+    public function process(QueryCollection $queries): void
     {
         if ($queries->isEmpty()) {
             return;
