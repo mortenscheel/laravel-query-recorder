@@ -49,9 +49,9 @@ readonly class DuplicateQueryCsvProcessor implements QueryCollectionProcessor
         if ($rows->isNotEmpty()) {
             /** @var resource $fh */
             $fh = fopen($this->path, 'wb');
-            fputcsv($fh, ['Count', 'Time', 'Origin', 'SQL']);
+            fputcsv($fh, ['Count', 'Time', 'Origin', 'SQL'], escape: '\\');
             foreach ($rows as $row) {
-                fputcsv($fh, $row);
+                fputcsv($fh, $row, escape: '\\');
             }
             fclose($fh);
         }

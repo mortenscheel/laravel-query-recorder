@@ -46,7 +46,7 @@ it('can provide correct origins for queries', function (): void {
     (new DummyClass)->doStuff();
     expect($detected)
         ->toBeInstanceOf(RecordedQuery::class)
-        ->and($detected->origin->file)->toBe((new ReflectionClass(DummyClass::class))->getFileName())
+        ->and($detected->origin->file)->toBe(new ReflectionClass(DummyClass::class)->getFileName())
         ->and($detected->origin->line)->toBe(18);
 });
 
@@ -62,9 +62,9 @@ it('can record queries to csv', function (): void {
     $secondQueryLine = __LINE__ - 1;
     executeDeferred();
     $stream = fopen($path, 'rb');
-    $header = fgetcsv($stream);
-    [,$origin1, $sql1] = fgetcsv($stream);
-    [,$origin2, $sql2] = fgetcsv($stream);
+    $header = fgetcsv($stream, escape: '\\');
+    [,$origin1, $sql1] = fgetcsv($stream, escape: '\\');
+    [,$origin2, $sql2] = fgetcsv($stream, escape: '\\');
     fclose($stream);
     expect($header)->toBe(['Time', 'Origin', 'SQL'])
         ->and($origin1)->toBe(__FILE__.':'.$firstQueryLine)
@@ -123,7 +123,7 @@ it('can record duplicate queries', function (): void {
     $stream = fopen($path, 'rb');
     fgets($stream); // Skip header
     /** @var array<int, string> $row */
-    while (($row = fgetcsv($stream)) !== false) {
+    while (($row = fgetcsv($stream, escape: '\\')) !== false) {
         // Convert origin to relative path for comparison
         $file = str($row[2])->beforeLast(':')->basename();
         $line = str($row[2])->afterLast(':')->value();

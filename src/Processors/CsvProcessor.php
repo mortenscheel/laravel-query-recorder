@@ -29,7 +29,7 @@ readonly class CsvProcessor implements QueryCollectionProcessor
         ])
             ->prepend(['Time', 'Origin', 'SQL'])
             ->each(function (array $row) use ($fh): void {
-                fputcsv($fh, $row);
+                fputcsv($fh, $row, escape: '\\');
             });
         fclose($fh);
     }
