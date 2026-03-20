@@ -1,5 +1,7 @@
 # Changelog
 
+# [3.0.0](https://github.com/mortenscheel/laravel-query-recorder/compare/2.0.0...3.0.0) (2026-03-20)
+
 # [2.0.0](https://github.com/mortenscheel/laravel-query-recorder/compare/1.1.0...2.0.0) (2025-03-28)
 
 
